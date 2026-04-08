@@ -4,6 +4,12 @@ import { SignJWT } from "jose";
 
 const COOKIE_NAME = "admin_token";
 
+function buildRedirectUrl(req: NextRequest, path: string): URL {
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? `localhost:${process.env.PORT ?? "3001"}`;
+  const proto = req.headers.get("x-forwarded-proto") ?? "http";
+  return new URL(path, `${proto}://${host}`);
+}
+
 export async function POST(req: NextRequest): Promise<NextResponse> {
   let username: string | undefined;
   let password: string | undefined;
@@ -25,7 +31,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
   }
 
   if (!username || !password) {
-    return NextResponse.redirect(new URL("/admin/login?error=1", req.url));
+    return NextResponse.redirect(buildRedirectUrl(req, "/admin/login?error=1"));
   }
 
   const expectedUsername = process.env.ADMIN_USERNAME;
@@ -34,14 +40,14 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   if (!expectedUsername || !expectedHash || !jwtSecret) {
     console.error("Admin credentials or JWT_SECRET not configured");
-    return NextResponse.redirect(new URL("/admin/login?error=1", req.url));
+    return NextResponse.redirect(buildRedirectUrl(req, "/admin/login?error=1"));
   }
 
   const usernameMatch = username === expectedUsername;
   const passwordMatch = await bcrypt.compare(password, expectedHash);
 
   if (!usernameMatch || !passwordMatch) {
-    return NextResponse.redirect(new URL("/admin/login?error=1", req.url));
+    return NextResponse.redirect(buildRedirectUrl(req, "/admin/login?error=1"));
   }
 
   const expirySeconds = parseInt(process.env.JWT_EXPIRY_SECONDS ?? "28800", 10);
@@ -53,9 +59,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     .setExpirationTime(`${expirySeconds}s`)
     .sign(secret);
 
-  const host = req.headers.get("host") ?? `localhost:${process.env.PORT ?? "3001"}`;
-  const proto = req.headers.get("x-forwarded-proto") ?? "http";
-  const res = NextResponse.redirect(new URL("/admin/movies", `${proto}://${host}`));
+  const res = NextResponse.redirect(buildRedirectUrl(req, "/admin/movies"));
   res.cookies.set(COOKIE_NAME, token, {
     httpOnly: true,
     sameSite: "strict",
