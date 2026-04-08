@@ -1,0 +1,654 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Movie {
+  id               Int              @id
+  internalId           String           @unique
+  eidr             String?
+  tmdbId           String?
+  imdbId           String?
+  jwId             String?
+  title            String
+  originalTitle    String?
+  tagline          String?
+  status           String?
+  description      String?
+  runtime          Int?
+  type             String           @default("movie")
+  releaseYear      Int?
+  releaseDate      DateTime?
+  awards           String?
+  budget           String?
+  revenue          String?
+  adult            Boolean          @default(false)
+  verifiedByTeam   Boolean          @default(false)
+  keywords         String?
+  voteAverage      Float?
+  voteCount        Int?
+  popularity       Float?
+  originalLanguage String?
+  actors           Actor[]
+  alternateTitles  AlternateTitle[]
+  contentRatings   ContentRating[]
+  crew             Crew[]
+  genres           GenreOnMovie[]
+  images           MovieImage[]
+  providers        MovieProvider[]
+  productions      Production[]
+  ratings          Rating[]
+  references       Reference?
+  reviews          Review[]
+  spokenLanguages  SpokenLanguage[]
+  videos           Video[]
+
+  @@index([popularity])
+  @@index([voteAverage])
+  @@index([releaseDate])
+  @@index([releaseYear])
+  @@index([type])
+}
+
+model AlternateTitle {
+  id          Int     @id @default(autoincrement())
+  movieId     Int
+  country     String
+  title       String
+  type        String?
+  language    String?
+  description String?
+  movie       Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([country])
+  @@index([language])
+}
+
+model ContentRating {
+  id          Int       @id @default(autoincrement())
+  movieId     Int
+  code        String
+  country     String
+  type        String
+  releaseDate DateTime?
+  note        String?
+  language    String?
+  movie       Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([country])
+}
+
+model SpokenLanguage {
+  id      Int    @id @default(autoincrement())
+  movieId Int
+  code    String
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+}
+
+model Rating {
+  id        Int     @id @default(autoincrement())
+  movieId   Int
+  source    String
+  value     Int
+  contentId String?
+  sourceUrl String?
+  movie     Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([source])
+}
+
+model MovieImage {
+  id      Int    @id @default(autoincrement())
+  movieId Int
+  url     String
+  type    String
+  ratio   Float?
+  height  Int?
+  width   Int?
+  movie   Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([type])
+}
+
+model Reference {
+  id           Int     @id @default(autoincrement())
+  movieId      Int     @unique
+  facebookId   String?
+  home         String?
+  imdbId       String?
+  instagramId  String?
+  twitterId    String?
+  wikidataId   String?
+  wikipedia    String?
+  wikipediaUrl String?
+  tmdbId       String?
+  tiktokId     String?
+  youtubeId    String?
+  eidrId       String?
+  movie        Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model Video {
+  id          Int     @id @default(autoincrement())
+  movieId     Int
+  name        String
+  description String?
+  duration    Int?
+  size        Int?
+  official    Boolean @default(false)
+  source      String?
+  type        String?
+  url         String
+  image       String?
+  movie       Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([type])
+}
+
+model Actor {
+  id            Int     @id @default(autoincrement())
+  movieId       Int
+  actorId       Int
+  internalId        String?
+  name          String
+  originalName  String?
+  gender        String?
+  image         String?
+  characterName String?
+  priority      Int?
+  bio           String?
+  birthName     String?
+  nickname      String?
+  height        String?
+  age           Int?
+  family        String?
+  trademarks    String?
+  trivia        String?
+  quotes        String?
+  otherWorks    String?
+  movie         Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([actorId])
+  @@index([priority])
+}
+
+model Crew {
+  id           Int     @id @default(autoincrement())
+  movieId      Int
+  crewId       Int
+  internalId       String?
+  name         String
+  originalName String?
+  gender       String?
+  image        String?
+  job          String
+  bio          String?
+  birthName    String?
+  nickname     String?
+  height       String?
+  age          Int?
+  family       String?
+  trademarks   String?
+  trivia       String?
+  quotes       String?
+  otherWorks   String?
+  movie        Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+  @@index([crewId])
+  @@index([job])
+}
+
+model Production {
+  id      Int     @id @default(autoincrement())
+  movieId Int
+  name    String
+  logo    String?
+  country String?
+  movie   Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([movieId])
+}
+
+model Review {
+  id        Int       @id @default(autoincrement())
+  movieId   Int
+  reviewId  String
+  author    String
+  content   String
+  rating    Float?
+  url       String
+  source    String    @default("tmdb")
+  createdAt DateTime?
+  updatedAt DateTime?
+  movie     Movie     @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, reviewId])
+  @@index([movieId])
+}
+
+model Provider {
+  id              Int              @id
+  name            String           @unique
+  logoPath        String?
+  displayPriority Int?
+  movies          MovieProvider[]
+  tvShows         TvShowProvider[]
+  seasons         SeasonProvider[]
+
+  @@index([displayPriority])
+}
+
+model Season {
+  id            Int              @id @default(autoincrement())
+  tvShowId      Int
+  seasonNumber  Int
+  name          String
+  overview      String?
+  airDate       DateTime?
+  posterPath    String?
+  voteAverage   Float?
+  episodeCount  Int?
+  tvShow        TvShow           @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+  episodes      Episode[]
+  images        SeasonImage[]
+  videos        SeasonVideo[]
+  providers     SeasonProvider[]
+
+  @@unique([tvShowId, seasonNumber])
+  @@index([tvShowId])
+}
+
+model Episode {
+  id            Int      @id @default(autoincrement())
+  tvShowId      Int
+  seasonId      Int
+  seasonNumber  Int
+  episodeNumber Int
+  name          String
+  overview      String?
+  airDate       DateTime?
+  runtime       Int?
+  stillPath     String?
+  voteAverage   Float?
+  voteCount     Int?
+  tvShow        TvShow   @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+  season        Season   @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@unique([tvShowId, seasonNumber, episodeNumber])
+  @@index([tvShowId])
+  @@index([seasonId])
+}
+
+model SeasonImage {
+  id       Int    @id @default(autoincrement())
+  seasonId Int
+  url      String
+  type     String
+  ratio    Float?
+  height   Int?
+  width    Int?
+  season   Season @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@index([seasonId])
+}
+
+model SeasonVideo {
+  id       Int     @id @default(autoincrement())
+  seasonId Int
+  name     String
+  source   String?
+  type     String?
+  url      String
+  image    String?
+  official Boolean @default(false)
+  season   Season  @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+
+  @@index([seasonId])
+}
+
+model SeasonProvider {
+  seasonId   Int
+  providerId Int
+  type       String
+  region     String   @default("IN")
+  url        String?
+  season     Season   @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  provider   Provider @relation(fields: [providerId], references: [id])
+
+  @@id([seasonId, providerId, type, region])
+  @@index([seasonId])
+  @@index([region])
+}
+
+model MovieProvider {
+  movieId    Int
+  providerId Int
+  type       String
+  region     String   @default("IN")
+  url        String?
+  cost       String?
+  quality    String?
+  iosUrl     String?
+  androidUrl String?
+  movie      Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  provider   Provider @relation(fields: [providerId], references: [id])
+
+  @@id([movieId, providerId, type, region])
+  @@index([providerId, type])
+  @@index([type])
+  @@index([region])
+}
+
+model Genre {
+  id      Int             @id
+  name    String          @unique
+  movies  GenreOnMovie[]
+  tvShows GenreOnTvShow[]
+}
+
+model GenreOnMovie {
+  movieId Int
+  genreId Int
+  genre   Genre @relation(fields: [genreId], references: [id])
+  movie   Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+  @@index([genreId])
+}
+
+model TvReview {
+  id        Int       @id @default(autoincrement())
+  tvShowId  Int
+  reviewId  String
+  author    String
+  content   String
+  rating    Float?
+  url       String
+  source    String    @default("tmdb")
+  createdAt DateTime?
+  updatedAt DateTime?
+  tvShow    TvShow    @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@unique([tvShowId, reviewId])
+  @@index([tvShowId])
+}
+
+model TvShow {
+  id               Int                @id
+  internalId           String             @unique
+  tmdbId           String?
+  imdbId           String?
+  jwId             String?
+  name             String
+  originalName     String?
+  tagline          String?
+  status           String?
+  description      String?
+  type             String             @default("tv")
+  firstAirDate     DateTime?
+  lastAirDate      DateTime?
+  numberOfSeasons  Int?
+  numberOfEpisodes Int?
+  voteAverage      Float?
+  voteCount        Int?
+  popularity       Float?
+  adult            Boolean            @default(false)
+  verifiedByTeam   Boolean            @default(false)
+  originalLanguage String?
+  keywords         String?
+  genres           GenreOnTvShow[]
+  actors           TvActor[]
+  alternateTitles  TvAlternateTitle[]
+  contentRatings   TvContentRating[]
+  crew             TvCrew[]
+  productions      TvProduction[]
+  ratings          TvRating[]
+  references       TvReference?
+  images           TvShowImage[]
+  providers        TvShowProvider[]
+  spokenLanguages  TvSpokenLanguage[]
+  videos           TvVideo[]
+  reviews          TvReview[]
+  seasons          Season[]
+  episodes         Episode[]
+
+  @@index([popularity])
+  @@index([voteAverage])
+  @@index([firstAirDate])
+  @@index([type])
+}
+
+model TvShowProvider {
+  tvShowId   Int
+  providerId Int
+  type       String
+  region     String   @default("IN")
+  url        String?
+  cost       String?
+  quality    String?
+  iosUrl     String?
+  androidUrl String?
+  provider   Provider @relation(fields: [providerId], references: [id])
+  tvShow     TvShow   @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@id([tvShowId, providerId, type, region])
+  @@index([providerId, type])
+  @@index([type])
+  @@index([region])
+}
+
+model GenreOnTvShow {
+  tvShowId Int
+  genreId  Int
+  genre    Genre  @relation(fields: [genreId], references: [id])
+  tvShow   TvShow @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@id([tvShowId, genreId])
+  @@index([genreId])
+}
+
+model TvShowImage {
+  id       Int    @id @default(autoincrement())
+  tvShowId Int
+  url      String
+  type     String
+  ratio    Float?
+  height   Int?
+  width    Int?
+  tvShow   TvShow @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([type])
+}
+
+model TvProduction {
+  id       Int     @id @default(autoincrement())
+  tvShowId Int
+  name     String
+  logo     String?
+  country  String?
+  tvShow   TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+}
+
+model TvAlternateTitle {
+  id          Int     @id @default(autoincrement())
+  tvShowId    Int
+  country     String
+  title       String
+  type        String?
+  language    String?
+  description String?
+  tvShow      TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([country])
+  @@index([language])
+}
+
+model TvContentRating {
+  id          Int       @id @default(autoincrement())
+  tvShowId    Int
+  code        String
+  country     String
+  type        String
+  releaseDate DateTime?
+  note        String?
+  language    String?
+  tvShow      TvShow    @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([country])
+}
+
+model TvSpokenLanguage {
+  id       Int    @id @default(autoincrement())
+  tvShowId Int
+  code     String
+  tvShow   TvShow @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+}
+
+model TvRating {
+  id        Int     @id @default(autoincrement())
+  tvShowId  Int
+  source    String
+  value     Int
+  contentId String?
+  sourceUrl String?
+  tvShow    TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([source])
+}
+
+model TvReference {
+  id           Int     @id @default(autoincrement())
+  tvShowId     Int     @unique
+  facebookId   String?
+  home         String?
+  imdbId       String?
+  instagramId  String?
+  twitterId    String?
+  wikidataId   String?
+  wikipedia    String?
+  wikipediaUrl String?
+  tmdbId       String?
+  tiktokId     String?
+  youtubeId    String?
+  eidrId       String?
+  tvShow       TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+}
+
+model TvVideo {
+  id          Int     @id @default(autoincrement())
+  tvShowId    Int
+  name        String
+  description String?
+  duration    Int?
+  size        Int?
+  official    Boolean @default(false)
+  source      String?
+  type        String?
+  url         String
+  image       String?
+  tvShow      TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([type])
+}
+
+model TvActor {
+  id            Int     @id @default(autoincrement())
+  tvShowId      Int
+  actorId       Int
+  internalId        String?
+  name          String
+  originalName  String?
+  gender        String?
+  image         String?
+  characterName String?
+  priority      Int?
+  bio           String?
+  birthName     String?
+  nickname      String?
+  height        String?
+  age           Int?
+  family        String?
+  trademarks    String?
+  trivia        String?
+  quotes        String?
+  otherWorks    String?
+  tvShow        TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([actorId])
+  @@index([priority])
+}
+
+model TvCrew {
+  id           Int     @id @default(autoincrement())
+  tvShowId     Int
+  crewId       Int
+  internalId       String?
+  name         String
+  originalName String?
+  gender       String?
+  image        String?
+  job          String
+  bio          String?
+  birthName    String?
+  nickname     String?
+  height       String?
+  age          Int?
+  family       String?
+  trademarks   String?
+  trivia       String?
+  quotes       String?
+  otherWorks   String?
+  tvShow       TvShow  @relation(fields: [tvShowId], references: [id], onDelete: Cascade)
+
+  @@index([tvShowId])
+  @@index([crewId])
+  @@index([job])
+}
+
+model SyncJob {
+  id            String    @id @default(cuid())
+  status        String    // "running" | "success" | "failed"
+  syncType      String    @default("all") // "all" | "movies" | "tv"
+  startedAt     DateTime  @default(now())
+  completedAt   DateTime?
+  moviesAdded   Int       @default(0)
+  moviesUpdated Int       @default(0)
+  errors        String[]  @default([])
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String   // "create" | "update" | "delete"
+  entityType String   // "movie" | "tvShow" | "provider"
+  entityId   String
+  entityName String
+  createdAt  DateTime @default(now())
+
+  @@index([entityType])
+  @@index([createdAt])
+}

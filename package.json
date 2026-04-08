@@ -1,0 +1,45 @@
+{
+  "name": "ott-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.18.1",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "lint": "turbo run lint",
+    "seed": "tsx scripts/seed-full.ts",
+    "seed:basic": "tsx scripts/seed.ts",
+    "seed:tv": "tsx scripts/seed-tv.ts",
+    "seed:imdb": "tsx scripts/seed-from-imdb.ts",
+    "seed:seasons": "tsx scripts/seed-tv-seasons.ts",
+    "sync": "tsx scripts/sync-movies.ts",
+    "db:clear": "tsx scripts/clear-db.ts",
+    "crawl:ids": "tsx scripts/crawl-external-ids.ts",
+    "crawl:ids:dry": "tsx scripts/crawl-external-ids.ts --dry-run",
+    "sync:providers": "tsx scripts/sync-provider-urls.ts",
+    "sync:providers:dry": "tsx scripts/sync-provider-urls.ts --dry-run",
+    "sync:reviews": "tsx scripts/sync-reviews.ts",
+    "sync:reviews:dry": "tsx scripts/sync-reviews.ts --dry-run"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/pg": "^8.16.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^17.3.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "prisma": "^7.4.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "turbo": "^2.5.4",
+    "typescript": "^5"
+  }
+}
