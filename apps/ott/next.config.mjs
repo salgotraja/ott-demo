@@ -1,6 +1,12 @@
-import type { NextConfig } from "next";
+import path from "path";
 
-const nextConfig: NextConfig = {
+/** @type {import("next").NextConfig} */
+const nextConfig = {
+  output: "standalone",
+  outputFileTracingRoot: path.resolve(process.cwd(), "../.."),
+  turbopack: {
+    root: path.resolve(process.cwd(), "../.."),
+  },
   images: {
     remotePatterns: [
       {
@@ -22,11 +28,9 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "img.youtube.com",
         pathname: "**",
-      }
+      },
     ],
-  }
+  },
 };
 
 export default nextConfig;
-
-import('@opennextjs/cloudflare').then(m => m.initOpenNextCloudflareForDev());
