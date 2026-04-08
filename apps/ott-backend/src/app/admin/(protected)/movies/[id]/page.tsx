@@ -44,7 +44,7 @@ export default async function MovieEditPage({ params }: Props) {
 
   if (!movie) notFound();
 
-  const currentGenreIds = movie.genres.map((g) => g.genreId);
+  const currentGenreIds = movie.genres.map((g: { genreId: number }) => g.genreId);
   const linkedProviders = movie.providers.map((mp) => ({
     providerId: mp.providerId,
     type: mp.type,
