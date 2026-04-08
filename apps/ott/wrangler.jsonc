@@ -6,6 +6,9 @@
   "compatibility_flags": [
     "nodejs_compat"
   ],
+  "vars": {
+    "INTERNAL_API_URL": "https://ott-demo-f517.onrender.com"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
@@ -13,7 +16,8 @@
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "ott-demo"
+      "service": "ott-demo",
+      "environment": "production"
     }
   ],
   "images": {
